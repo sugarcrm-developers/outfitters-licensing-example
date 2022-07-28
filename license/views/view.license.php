@@ -67,13 +67,6 @@ class ViewLicense extends SugarView
             $this->ss->assign("IS_SUGAR_6",false);
         }
 
-        if(!function_exists('curl_init')){
-            global $current_language;
-            $admin_mod_strings = return_module_language($current_language, 'Administration');
-            $curl_not_enabled = $admin_mod_strings['ERR_ENABLE_CURL'];
-            $this->ss->assign("CURL_NOT_ENABLED",$curl_not_enabled);
-        }
-
         if(isset($outfitters_config['validate_users']) && $outfitters_config['validate_users'] == true) {
             $this->ss->assign("validate_users", true);
             //get user count for all active, non-portal, non-group users
