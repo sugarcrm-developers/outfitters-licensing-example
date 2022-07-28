@@ -12,7 +12,7 @@ desktop.ini
 build
 .idea
 nbproject/
-
+*.zip
 
 # the composer package lock file and install directory
 /composer.lock

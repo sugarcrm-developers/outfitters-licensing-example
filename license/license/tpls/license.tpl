@@ -55,22 +55,6 @@
 
     function outfitters_validate_license()
     {
-        var curl_not_enabled = '{/literal}{$CURL_NOT_ENABLED}{literal}';
-        if(curl_not_enabled) {
-{/literal}{if $IS_SUGAR_6 == true}{literal}
-            alert(curl_not_enabled);
-{/literal}{else}{literal}
-            var app = window.parent.SUGAR.App;
-            app.alert.show('License_error', {
-                level: 'error',
-                title: app.lang.get('ERR_LICENSE_CONNECTION', 'AddonBoilerplate'),
-                messages: curl_not_enabled,
-                autoClose: false
-            });
-{/literal}{/if}{literal}
-
-            return;
-        }
         var licKey = $('#outfitters_license_key').val();
         if(!licKey) {
             return false;
@@ -141,22 +125,6 @@
 
     function outfitters_increase_license(increase_to)
     {
-        var curl_not_enabled = '{/literal}{$CURL_NOT_ENABLED}{literal}';
-        if(curl_not_enabled) {
-{/literal}{if $IS_SUGAR_6 == true}{literal}
-            alert(curl_not_enabled);
-{/literal}{else}{literal}
-            var app = window.parent.SUGAR.App;
-            app.alert.show('License_error', {
-                level: 'error',
-                title: app.lang.get('ERR_LICENSE_CONNECTION', 'AddonBoilerplate'),
-                messages: curl_not_enabled,
-                autoClose: false
-            });
-{/literal}{/if}{literal}
-
-            return;
-        }
         var licKey = $('#outfitters_license_key').val();
         if(!licKey) {
             return false;

@@ -26,26 +26,25 @@ Notes:
 $manifest = array (
     'acceptable_sugar_versions' =>  array (
         'regex_matches' => array(
-            '.*',
+            '11\\.(.*?)\\.(.*?)',
+            '12\\.(.*?)\\.(.*?)',
         ),
     ),
     'acceptable_sugar_flavors' => array(
-        'CE',
         'PRO',
         'ENT',
-        'CORP',
         'ULT',
     ),
     'readme'=>'',
     'key'=>'',
     'author' => 'SugarOutfitters',
-    'description' => 'Sample add-on with license validation',
+    'description' => 'Sample add-on with license validation using ExternalResourceClient',
     'icon' => '',
     'is_uninstallable' => true,
     'name' => 'SampleLicenseAddon', // <-- CHANGE NAME HERE - To your module name, whatever you put here needs to go in license/config.php
-    'published_date' => '2021/11/19',
+    'published_date' => '2022/07/26',
     'type' => 'module',
-    'version' => '1.8',
+    'version' => '1.9',
     'remove_tables' => false,
 
 );
