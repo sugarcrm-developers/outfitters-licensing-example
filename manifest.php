@@ -26,8 +26,9 @@ Notes:
 $manifest = array (
     'acceptable_sugar_versions' =>  array (
         'regex_matches' => array(
-            '11\\.(.*?)\\.(.*?)',
+            '13\\.(.*?)\\.(.*?)',
             '12\\.(.*?)\\.(.*?)',
+            '11\\.(.*?)\\.(.*?)',
         ),
     ),
     'acceptable_sugar_flavors' => array(
@@ -42,9 +43,9 @@ $manifest = array (
     'icon' => '',
     'is_uninstallable' => true,
     'name' => 'SampleLicenseAddon', // <-- CHANGE NAME HERE - To your module name, whatever you put here needs to go in license/config.php
-    'published_date' => '2022/07/26',
+    'published_date' => '2023/07/18',
     'type' => 'module',
-    'version' => '1.9',
+    'version' => '2.0',
     'remove_tables' => false,
 
 );

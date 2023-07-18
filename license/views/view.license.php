@@ -28,6 +28,8 @@ class ViewLicense extends SugarView
 
     public function display()
     {
+        $outfitters_config = [];
+        $licensed_users = null;
         global $current_user, $app_strings, $sugar_config, $currentModule, $sugar_version;
 
         //load license validation config
@@ -71,8 +73,8 @@ class ViewLicense extends SugarView
             $this->ss->assign("validate_users", true);
             //get user count for all active, non-portal, non-group users
             $active_users = get_user_array(FALSE,'Active','',false,'',' AND portal_only=0 AND is_group=0');
-            $this->ss->assign("current_users", count($active_users));
-            $this->ss->assign("user_count_param", "user_count: '".count($active_users)."'");
+            $this->ss->assign("current_users", is_countable($active_users) ? count($active_users) : 0);
+            $this->ss->assign("user_count_param", "user_count: '".(is_countable($active_users) ? count($active_users) : 0)."'");
         } else {
             $this->ss->assign("validate_users", false);
             $this->ss->assign("current_users", '');

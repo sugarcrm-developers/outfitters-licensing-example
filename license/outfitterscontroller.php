@@ -37,7 +37,7 @@ if($_REQUEST['method'] == 'validate') {
         
         $validated = OutfittersLicense::doValidate($currentModule);
         
-        if(is_array($validated['result'])) {
+        if((is_countable($validated) ? count($validated) : 0) && is_array($validated['result'])) {
             echo "<br/><br/>Key validation = ".!empty($validated['result']['validated']);
             require('modules/'.$currentModule.'/license/config.php');
 
