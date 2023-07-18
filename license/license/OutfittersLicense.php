@@ -15,6 +15,7 @@ if(!class_exists('OutfittersLicense'))
          */
         public static function isValid($thisModule=null,$user_id=null,$force_validation=false)
         {
+            $outfitters_config = [];
             if(empty($thisModule)) {
                 global $currentModule;
                 $thisModule = $currentModule;
@@ -125,6 +126,7 @@ if(!class_exists('OutfittersLicense'))
 
         public static function getKey($thisModule=null)
         {
+            $outfitters_config = [];
             if(empty($thisModule)) {
                 global $currentModule;
                 $thisModule = $currentModule;
@@ -169,6 +171,7 @@ if(!class_exists('OutfittersLicense'))
          */
         public static function validate()
         {
+            $outfitters_config = [];
             $json = getJSONobj();
             if(empty($_REQUEST['key'])) {
                 header('HTTP/1.1 400 Bad Request');
@@ -245,6 +248,7 @@ if(!class_exists('OutfittersLicense'))
          */
         public static function change()
         {
+            $outfitters_config = [];
             if(empty($_REQUEST['key'])) {
                 header('HTTP/1.1 400 Bad Request');
                 $response = "Key is required.";
@@ -295,7 +299,8 @@ if(!class_exists('OutfittersLicense'))
          */
         public static function add()
         {
-            if(empty($_REQUEST['licensed_users']) || count($_REQUEST['licensed_users']) == 0) {
+            $outfitters_config = [];
+            if(empty($_REQUEST['licensed_users']) || (is_countable($_REQUEST['licensed_users']) ? count($_REQUEST['licensed_users']) : 0) == 0) {
                 header('HTTP/1.1 400 Bad Request');
                 $response = "No additional licenses were set to be added.";
                 $json = getJSONobj();
@@ -399,6 +404,7 @@ if (!class_exists('SugarOutfitters_API'))
     {
         private static function get_default_payload($module,$custom_data = array())
         {
+            $outfitters_config = [];
             global $sugar_config, $sugar_flavor, $db;
             $not_set_value = 'not set';
             $data = array();
@@ -498,6 +504,7 @@ if (!class_exists('SugarOutfitters_API'))
 
         public static function call($module,$path,$custom_data=array(),$method='post')
         {
+            $outfitters_config = [];
             if (empty($module))
             {
                 return array(
