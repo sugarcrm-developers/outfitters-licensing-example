@@ -13,7 +13,7 @@ Notes:
         'name' => 'SampleLicenseAddon', //The same name of the Add-on listed in your manifest file.
         'shortname' => 'samplelicenseaddon', //The short name of your Add-on
         'public_key' => '', //The public key associated with the group this download is associated with
-        'api_url' => 'https://www.sugaroutfitters.com/api/v1', //generall leave as is
+        'api_url' => 'https://marketplace.sugarcrm.com/api/v1', //generall leave as is
         'validate_users' => false, //whether you want to validate users or not. This should match the "Require User Count Verification" option in the group this download is associated with
         'continue_url' => '', //[optional] Will show a button after license validation that will redirect to this page. Could be used to redirect to a configuration page such as index.php?module=MyCustomModule&action=config
     3. Change the 'to' in the copy array below
@@ -26,6 +26,7 @@ Notes:
 $manifest = array (
     'acceptable_sugar_versions' =>  array (
         'regex_matches' => array(
+            '14\\.(.*?)\\.(.*?)',
             '13\\.(.*?)\\.(.*?)',
             '12\\.(.*?)\\.(.*?)',
             '11\\.(.*?)\\.(.*?)',
@@ -43,9 +44,9 @@ $manifest = array (
     'icon' => '',
     'is_uninstallable' => true,
     'name' => 'SampleLicenseAddon', // <-- CHANGE NAME HERE - To your module name, whatever you put here needs to go in license/config.php
-    'published_date' => '2023/07/18',
+    'published_date' => '2024/11/13',
     'type' => 'module',
-    'version' => '2.0',
+    'version' => '2.1',
     'remove_tables' => false,
 
 );
