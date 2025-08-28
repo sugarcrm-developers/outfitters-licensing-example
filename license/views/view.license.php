@@ -28,13 +28,13 @@ class ViewLicense extends SugarView
 
     public function display()
     {
-        $outfitters_config = [];
+        $marketplace_config = [];
         $licensed_users = null;
         global $current_user, $app_strings, $sugar_config, $currentModule, $sugar_version;
 
         //load license validation config
         require_once('modules/'.$currentModule.'/license/config.php');
-        require_once('modules/'.$currentModule.'/license/OutfittersLicense.php');
+        require_once('modules/'.$currentModule.'/license/MarketplaceLicense.php');
 
         echo $this->getModuleTitle();
 
@@ -52,13 +52,13 @@ class ViewLicense extends SugarView
         $license_strings = ViewLicense::loadLicenseStrings();
         $this->ss->assign("LICENSE", $license_strings);
 
-        $key = OutfittersLicense::getKey($currentModule);
+        $key = MarketplaceLicense::getKey($currentModule);
 
         if(!empty($key)) {
             $this->ss->assign("license_key", $key);
         }
 
-        $this->ss->assign("continue_url",$outfitters_config['continue_url']);
+        $this->ss->assign("continue_url",$marketplace_config['continue_url']);
 
         //todo: check version of SugarCRM instead
         $this->ss->assign("file_path", getJSPath("modules/".$currentModule."/license/lib/jquery-1.7.1.min.js"));
@@ -69,7 +69,7 @@ class ViewLicense extends SugarView
             $this->ss->assign("IS_SUGAR_6",false);
         }
 
-        if(isset($outfitters_config['validate_users']) && $outfitters_config['validate_users'] == true) {
+        if(isset($marketplace_config['validate_users']) && $marketplace_config['validate_users'] == true) {
             $this->ss->assign("validate_users", true);
             //get user count for all active, non-portal, non-group users
             $active_users = get_user_array(FALSE,'Active','',false,'',' AND portal_only=0 AND is_group=0');
@@ -81,7 +81,7 @@ class ViewLicense extends SugarView
             $this->ss->assign("user_count_param", '');
         }
         
-        if(isset($outfitters_config['manage_licensed_users']) && $outfitters_config['manage_licensed_users'] == true) {
+        if(isset($marketplace_config['manage_licensed_users']) && $marketplace_config['manage_licensed_users'] == true) {
             $this->ss->assign("manage_licensed_users", true);
             $this->ss->assign("validation_required", true);
             
@@ -90,14 +90,14 @@ class ViewLicense extends SugarView
             $administration = new Administration();
             $administration->retrieveSettings();
             
-            $last_validation = $administration->settings['SugarOutfitters_'.$outfitters_config['shortname']];
+            $last_validation = $administration->settings['SugarMarketplace_'.$marketplace_config['shortname']];
 
             $trimmed_last = trim($last_validation);
             //only run a license check if one has been done in the past            
             if(!empty($trimmed_last))
             {
                 //if new then don't do
-                $validated = OutfittersLicense::doValidate($currentModule);
+                $validated = MarketplaceLicense::doValidate($currentModule);
 
                 $store = array(
                     'last_ran' => time(),
@@ -105,7 +105,7 @@ class ViewLicense extends SugarView
                 );
 
                 $serialized = base64_encode(serialize($store));
-                $administration->saveSetting('SugarOutfitters', $outfitters_config['shortname'], $serialized);
+                $administration->saveSetting('SugarMarketplace', $marketplace_config['shortname'], $serialized);
 
                 $licensed_users = 0;
                 //check last validation
@@ -130,7 +130,7 @@ class ViewLicense extends SugarView
             
             $used_licenses = 0;
             global $db,$locale;
-            $result = $db->query("SELECT users.id, users.user_name, users.first_name, users.last_name FROM so_users INNER JOIN users ON so_users.user_id = users.id WHERE shortname = '".$db->quote($outfitters_config['shortname'])."'",false);
+            $result = $db->query("SELECT users.id, users.user_name, users.first_name, users.last_name FROM so_users INNER JOIN users ON so_users.user_id = users.id WHERE shortname = '".$db->quote($marketplace_config['shortname'])."'",false);
             while($row = $db->fetchByAssoc($result))
             {
                 $used_licenses++;

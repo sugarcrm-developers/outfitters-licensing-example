@@ -20,33 +20,32 @@ Notes:
     4. Edit /scripts/post_install.php and change redirect to your module
     5. Double check each line in the manifest that has "// <-- CHANGE NAME HERE" tagged at the end of the line
     6. Do a search/replace of SampleLicenseAddon, samplelicenseaddon, and SAMPLELICENSEADDON in all files
-    7. Rename /license/license/OutfittersLicense.php, the class name, and all references to OutfittersLicense
-        to something unique relating to your addon such as MyAddonOutfittersLicense.php->MyAddonOutfittersLicense
+    7. Rename /license/license/MarketplaceLicense.php, the class name, and all references to MarketplaceLicense
+        to something unique relating to your addon such as MyAddonMarketplaceLicense.php->MyAddonMarketplaceLicense
 */
 $manifest = array (
     'acceptable_sugar_versions' =>  array (
         'regex_matches' => array(
+            '26\\.(.*?)\\.(.*?)',
+            '25\\.(.*?)\\.(.*?)',
             '14\\.(.*?)\\.(.*?)',
             '13\\.(.*?)\\.(.*?)',
-            '12\\.(.*?)\\.(.*?)',
-            '11\\.(.*?)\\.(.*?)',
         ),
     ),
     'acceptable_sugar_flavors' => array(
         'PRO',
         'ENT',
-        'ULT',
     ),
     'readme'=>'',
     'key'=>'',
-    'author' => 'SugarOutfitters',
-    'description' => 'Sample add-on with license validation using ExternalResourceClient',
+    'author' => 'SugarCRM Marketplace',
+    'description' => 'Sample SugarCRM Marketplace add-on with license validation using ExternalResourceClient',
     'icon' => '',
     'is_uninstallable' => true,
     'name' => 'SampleLicenseAddon', // <-- CHANGE NAME HERE - To your module name, whatever you put here needs to go in license/config.php
-    'published_date' => '2024/11/13',
+    'published_date' => '2025/08/27',
     'type' => 'module',
-    'version' => '2.1',
+    'version' => '3.0',
     'remove_tables' => false,
 
 );
