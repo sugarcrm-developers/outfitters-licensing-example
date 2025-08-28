@@ -2,9 +2,9 @@
 use Sugarcrm\Sugarcrm\Security\HttpClient\ExternalResourceClient;
 use Sugarcrm\Sugarcrm\Security\HttpClient\RequestException;
 
-if(!class_exists('OutfittersLicense'))
+if(!class_exists('MarketplaceLicense'))
 {
-    class OutfittersLicense
+    class MarketplaceLicense
     {
         /**
          * For validation via server-side. Whomever calls this should handle what to do in case of a failure.
@@ -15,7 +15,7 @@ if(!class_exists('OutfittersLicense'))
          */
         public static function isValid($thisModule=null,$user_id=null,$force_validation=false)
         {
-            $outfitters_config = [];
+            $marketplace_config = [];
             if(empty($thisModule)) {
                 global $currentModule;
                 $thisModule = $currentModule;
@@ -32,10 +32,10 @@ if(!class_exists('OutfittersLicense'))
             //check to see if the passed user is allowed to use the add-on
             //if not then return a message...otherwise continue with the normal license check
             //ignore a passed user id if validate_users is not enabled
-            if(!empty($user_id) && $outfitters_config['validate_users'] == true)
+            if(!empty($user_id) && $marketplace_config['validate_users'] == true)
             {
                 global $db;
-                $result = $db->query("SELECT id FROM so_users WHERE shortname = '".$db->quote($outfitters_config['shortname'])."' and user_id = '".$db->quote($user_id)."'",false);
+                $result = $db->query("SELECT id FROM so_users WHERE shortname = '".$db->quote($marketplace_config['shortname'])."' and user_id = '".$db->quote($user_id)."'",false);
                 $row = $db->fetchByAssoc($result);
                 if(empty($row)) {
                     return 'The user does not have access to this add-on.';
@@ -47,9 +47,9 @@ if(!class_exists('OutfittersLicense'))
             $administration = new Administration();
             $administration->retrieveSettings();
             $last_validation = null;
-            if(!empty($administration->settings['SugarOutfitters_'.$outfitters_config['shortname']]))
+            if(!empty($administration->settings['SugarMarketplace_'.$marketplace_config['shortname']]))
             {
-                $last_validation = $administration->settings['SugarOutfitters_'.$outfitters_config['shortname']];
+                $last_validation = $administration->settings['SugarMarketplace_'.$marketplace_config['shortname']];
             }
             $trimmed_last = trim($last_validation); //to be safe...
 
@@ -61,7 +61,7 @@ if(!class_exists('OutfittersLicense'))
 
                 //if enough time hasn't passed then just return the last result
                 //even if the last result failed
-                $frequency = $outfitters_config['validation_frequency'];
+                $frequency = $marketplace_config['validation_frequency'];
                 $elapsed = (7 * 24 * 60 * 60); //default to weekly
                 if($frequency == 'hourly') {
                     $elapsed = (60 * 60);
@@ -75,7 +75,7 @@ if(!class_exists('OutfittersLicense'))
                     } else {
                         $validation_result = !empty($last_validation['last_result']['result']['validated']);
 
-                        if($outfitters_config['validate_users'] == true)
+                        if($marketplace_config['validate_users'] == true)
                         {
                             if(!empty($last_validation['last_result']['result']) && (empty($last_validation['last_result']['result']['validated_users']) || $last_validation['last_result']['result']['validated_users']!==true))
                             {
@@ -93,7 +93,7 @@ if(!class_exists('OutfittersLicense'))
             }
 
             //otherwise continue with validation
-            $validated = OutfittersLicense::doValidate($thisModule);
+            $validated = MarketplaceLicense::doValidate($thisModule);
 
             $store = array(
                 'last_ran' => time(),
@@ -101,14 +101,14 @@ if(!class_exists('OutfittersLicense'))
             );
 
             $serialized = base64_encode(serialize($store));
-            $administration->saveSetting('SugarOutfitters', $outfitters_config['shortname'], $serialized);
+            $administration->saveSetting('SugarMarketplace', $marketplace_config['shortname'], $serialized);
 
             if($validated['success'] === false) {
                 return $validated['result'];
             } else {
                 $validation_result = !empty($validated['result']['validated']);
 
-                if($outfitters_config['validate_users'] == true)
+                if($marketplace_config['validate_users'] == true)
                 {
                     if(!empty($validated['result']) && (empty($validated['result']['validated_users']) || $validated['result']['validated_users']!==true))
                     {
@@ -126,7 +126,7 @@ if(!class_exists('OutfittersLicense'))
 
         public static function getKey($thisModule=null)
         {
-            $outfitters_config = [];
+            $marketplace_config = [];
             if(empty($thisModule)) {
                 global $currentModule;
                 $thisModule = $currentModule;
@@ -143,20 +143,20 @@ if(!class_exists('OutfittersLicense'))
             $administration = new Administration();
             $administration->retrieveSettings();
             $key = null;
-            if(!empty($administration->settings['SugarOutfitters_lic_'.$outfitters_config['shortname']]))
+            if(!empty($administration->settings['SugarMarketplace_lic_'.$marketplace_config['shortname']]))
             {
-                $key = $administration->settings['SugarOutfitters_lic_'.$outfitters_config['shortname']];
+                $key = $administration->settings['SugarMarketplace_lic_'.$marketplace_config['shortname']];
             }
 
             //just in case they are using the old config_override.php method
-            if(empty($key) && !empty($sugar_config['outfitters_licenses']) && !empty($sugar_config['outfitters_licenses'][$outfitters_config['shortname']]))
+            if(empty($key) && !empty($sugar_config['marketplace_licenses']) && !empty($sugar_config['marketplace_licenses'][$marketplace_config['shortname']]))
             {
-                $key = $sugar_config['outfitters_licenses'][$outfitters_config['shortname']];
+                $key = $sugar_config['marketplace_licenses'][$marketplace_config['shortname']];
 
                 //stash this key in the config table
                 if(!empty($key))
                 {
-                    $administration->saveSetting('SugarOutfitters', 'lic_'.$outfitters_config['shortname'], $key);
+                    $administration->saveSetting('SugarMarketplace', 'lic_'.$marketplace_config['shortname'], $key);
                 }
             }
 
@@ -171,7 +171,7 @@ if(!class_exists('OutfittersLicense'))
          */
         public static function validate()
         {
-            $outfitters_config = [];
+            $marketplace_config = [];
             $json = getJSONobj();
             if(empty($_REQUEST['key'])) {
                 header('HTTP/1.1 400 Bad Request');
@@ -185,7 +185,7 @@ if(!class_exists('OutfittersLicense'))
             //load license validation config
             require('modules/'.$currentModule.'/license/config.php');
 
-            $validated = OutfittersLicense::doValidate($currentModule,$_REQUEST['key']);
+            $validated = MarketplaceLicense::doValidate($currentModule,$_REQUEST['key']);
 
             $store = array(
                 'last_ran' => time(),
@@ -195,7 +195,7 @@ if(!class_exists('OutfittersLicense'))
             require_once('modules/Administration/Administration.php');
             $administration = new Administration();
             $serialized = base64_encode(serialize($store));
-            $administration->saveSetting('SugarOutfitters', $outfitters_config['shortname'], $serialized);
+            $administration->saveSetting('SugarMarketplace', $marketplace_config['shortname'], $serialized);
 
             if($validated['success'] === false) {
                 header('HTTP/1.1 400 Bad Request');
@@ -206,7 +206,7 @@ if(!class_exists('OutfittersLicense'))
                 //load license validation config
                 require('modules/'.$currentModule.'/license/config.php');
 
-                $administration->saveSetting('SugarOutfitters', 'lic_'.$outfitters_config['shortname'], $_REQUEST['key']);
+                $administration->saveSetting('SugarMarketplace', 'lic_'.$marketplace_config['shortname'], $_REQUEST['key']);
             }
 
             echo $json->encode($validated['result']);
@@ -233,11 +233,11 @@ if(!class_exists('OutfittersLicense'))
                 $data['key'] = $key;
             }
 
-            $response = SugarOutfitters_API::call($thisModule,'key/validate',$data,'get');
+            $response = SugarMarketplace_API::call($thisModule,'key/validate',$data,'get');
 
             if(empty($response['success']) || $response['success']!==true)
             {
-                $GLOBALS['log']->fatal('OutfittersLicense::doValidate() failed: '.print_r($response,true));
+                $GLOBALS['log']->fatal('MarketplaceLicense::doValidate() failed: '.print_r($response,true));
             }
 
             return $response;
@@ -248,7 +248,7 @@ if(!class_exists('OutfittersLicense'))
          */
         public static function change()
         {
-            $outfitters_config = [];
+            $marketplace_config = [];
             if(empty($_REQUEST['key'])) {
                 header('HTTP/1.1 400 Bad Request');
                 $response = "Key is required.";
@@ -274,19 +274,19 @@ if(!class_exists('OutfittersLicense'))
                 'user_count' => $_REQUEST['user_count'],
             );
 
-            $response = SugarOutfitters_API::call($currentModule,'key/change',$data);
+            $response = SugarMarketplace_API::call($currentModule,'key/change',$data);
 
             //if it is not a 200 response assume a 400. Good enough for this purpose.
             if(empty($response['success']) || $response['success']!==true)
             {
                 header('HTTP/1.1 400 Bad Request');
-                $GLOBALS['log']->fatal('OutfittersLicense::change() failed: '.print_r($response,true));
+                $GLOBALS['log']->fatal('MarketplaceLicense::change() failed: '.print_r($response,true));
             }
             else
             {
                 require_once('modules/Administration/Administration.php');
                 $administration = new Administration();
-                $administration->saveSetting('SugarOutfitters', 'lic_'.$outfitters_config['shortname'], $_REQUEST['key']);
+                $administration->saveSetting('SugarMarketplace', 'lic_'.$marketplace_config['shortname'], $_REQUEST['key']);
             }
 
             $json = getJSONobj();
@@ -299,7 +299,7 @@ if(!class_exists('OutfittersLicense'))
          */
         public static function add()
         {
-            $outfitters_config = [];
+            $marketplace_config = [];
             if(empty($_REQUEST['licensed_users']) || (is_countable($_REQUEST['licensed_users']) ? count($_REQUEST['licensed_users']) : 0) == 0) {
                 header('HTTP/1.1 400 Bad Request');
                 $response = "No additional licenses were set to be added.";
@@ -314,7 +314,7 @@ if(!class_exists('OutfittersLicense'))
             require('modules/'.$currentModule.'/license/config.php');
 
             //check to ensure that the licensed_users does not exceed the amount purchased
-            $response = OutfittersLicense::doValidate($currentModule);
+            $response = MarketplaceLicense::doValidate($currentModule);
 
             if(empty($response['success']) || $response['success'] !== true || empty($response['result']['validated']))
             {
@@ -325,7 +325,7 @@ if(!class_exists('OutfittersLicense'))
                 exit;
             }
 
-            if($outfitters_config['validate_users'] == true)
+            if($marketplace_config['validate_users'] == true)
             {
                 if(!empty($response['result']) && (empty($response['result']['validated_users']) || $response['result']['validated_users']!==true))
                 {
@@ -375,12 +375,12 @@ if(!class_exists('OutfittersLicense'))
 
             global $db;
             //drop existing
-            $sql = "DELETE FROM so_users WHERE shortname = '".$db->quote($outfitters_config['shortname'])."'";
-            $db->query($sql,true,'Unable to reset licensed users for '.$outfitters_config['shortname']);
+            $sql = "DELETE FROM so_users WHERE shortname = '".$db->quote($marketplace_config['shortname'])."'";
+            $db->query($sql,true,'Unable to reset licensed users for '.$marketplace_config['shortname']);
             foreach($_REQUEST['licensed_users'] as $licensed_user) {
                 $data = array(
                     'id' => create_guid(),
-                    'shortname' => $outfitters_config['shortname'],
+                    'shortname' => $marketplace_config['shortname'],
                     'user_id' => $licensed_user,
                     'deleted' => 0,
                 );
@@ -398,13 +398,13 @@ if(!class_exists('OutfittersLicense'))
     }
 }
 
-if (!class_exists('SugarOutfitters_API'))
+if (!class_exists('SugarMarketplace_API'))
 {
-    class SugarOutfitters_API
+    class SugarMarketplace_API
     {
         private static function get_default_payload($module,$custom_data = array())
         {
-            $outfitters_config = [];
+            $marketplace_config = [];
             global $sugar_config, $sugar_flavor, $db;
             $not_set_value = 'not set';
             $data = array();
@@ -414,7 +414,7 @@ if (!class_exists('SugarOutfitters_API'))
 
             // set the key, check custom data first in case developer wants to explicitly set a key
             if (empty($custom_data['key'])){
-                $key = OutfittersLicense::getKey($module);
+                $key = MarketplaceLicense::getKey($module);
                 $data['key'] = empty($key) ? false : $key;
             }else{
                 $data['key'] = $custom_data['key'];
@@ -422,7 +422,7 @@ if (!class_exists('SugarOutfitters_API'))
 
             // set public key, check custom data first in case developer wants to explicitly set a public key
             if (empty($custom_data['public_key'])){
-                $data['public_key'] = empty($outfitters_config['public_key']) ? $not_set_value : $outfitters_config['public_key'];
+                $data['public_key'] = empty($marketplace_config['public_key']) ? $not_set_value : $marketplace_config['public_key'];
             }else{
                 $data['public_key'] = $custom_data['public_key'];
             }
@@ -430,11 +430,11 @@ if (!class_exists('SugarOutfitters_API'))
             // set user counts, check custom data first in case developer wants to explicitly set a user count
             if(!empty($custom_data['user_count'])){
                 $data['user_count'] = $custom_data['user_count'];
-            }else if(isset($outfitters_config['manage_licensed_users']) && $outfitters_config['manage_licensed_users'] == true) {
+            }else if(isset($marketplace_config['manage_licensed_users']) && $marketplace_config['manage_licensed_users'] == true) {
                 //using built-in user license management
                 $licensed_users = 0;
-                $sql = "SELECT count(*) as the_count FROM so_users WHERE shortname = '".$db->quote($outfitters_config['shortname'])."'";
-                $result = $db->query($sql,false,'Unable to reset licensed users for '.$outfitters_config['shortname']);
+                $sql = "SELECT count(*) as the_count FROM so_users WHERE shortname = '".$db->quote($marketplace_config['shortname'])."'";
+                $result = $db->query($sql,false,'Unable to reset licensed users for '.$marketplace_config['shortname']);
                 $row = $db->fetchByAssoc($result);
                 if(!empty($row)) {
                     $licensed_users = $row['the_count'];
@@ -468,9 +468,9 @@ if (!class_exists('SugarOutfitters_API'))
 
             // attempt to get addon version
             $data['addon_version'] = $not_set_value;
-            if (!empty($outfitters_config['name']))
+            if (!empty($marketplace_config['name']))
             {
-                $result = $db->query("select version from upgrade_history where id_name = '".$db->quote($outfitters_config['name'])."' order by date_entered DESC");
+                $result = $db->query("select version from upgrade_history where id_name = '".$db->quote($marketplace_config['name'])."' order by date_entered DESC");
                 $row = $db->fetchByAssoc($result);
                 if (!empty($row))
                 {
@@ -483,7 +483,7 @@ if (!class_exists('SugarOutfitters_API'))
             }
             else
             {
-                $data['addon_version'] = "Error: 'name' not set in outfitters_config.";
+                $data['addon_version'] = "Error: 'name' not set in marketplace_config.";
             }
 
             // process any metadata passed in
@@ -504,7 +504,7 @@ if (!class_exists('SugarOutfitters_API'))
 
         public static function call($module,$path,$custom_data=array(),$method='post')
         {
-            $outfitters_config = [];
+            $marketplace_config = [];
             if (empty($module))
             {
                 return array(
@@ -531,7 +531,7 @@ if (!class_exists('SugarOutfitters_API'))
 
             //load license validation config and generate url from config
             require('modules/'.$module.'/license/config.php');
-            $url = $outfitters_config['api_url'] . '/' . $path;
+            $url = $marketplace_config['api_url'] . '/' . $path;
 
             // get default payload data
             $data = static::get_default_payload($module,$custom_data);
@@ -561,7 +561,7 @@ if (!class_exists('SugarOutfitters_API'))
                 $result = !empty($response) ? json_decode($response->getBody()->getContents(), true) : null;
                 if($httpCode != 200)
                 {
-                    $GLOBALS['log']->fatal('SugarOutfitters_API::call(): HTTP Request failed: ' . print_r($httpCode,true));
+                    $GLOBALS['log']->fatal('SugarMarketplace_API::call(): HTTP Request failed: ' . print_r($httpCode,true));
                     return array(
                         'success' => false,
                         'result' => $result
@@ -575,10 +575,10 @@ if (!class_exists('SugarOutfitters_API'))
                     );
                 }
             } catch (Exception $e) {
-                $GLOBALS['log']->fatal('SugarOutfitters_API::call(): Unable to validate license. Please configure the firewall to allow requests to '.$outfitters_config['api_url'].'/key/validate and make sure that SSL certs are up to date on the server.');
+                $GLOBALS['log']->fatal('SugarMarketplace_API::call(): Unable to validate license. Please configure the firewall to allow requests to '.$marketplace_config['api_url'].'/key/validate and make sure that SSL certs are up to date on the server.');
                 return array(
                     'success' => false,
-                    'result' => 'SugarOutfitters_API::call(): Unable to validate the license key. Please configure the firewall to allow requests to '.$outfitters_config['api_url'].'/key/validate and make sure that SSL certs are up to date on the server.'
+                    'result' => 'SugarMarketplace_API::call(): Unable to validate the license key. Please configure the firewall to allow requests to '.$marketplace_config['api_url'].'/key/validate and make sure that SSL certs are up to date on the server.'
                 );
             }
         }
